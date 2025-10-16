@@ -12,6 +12,6 @@ import com.example.status.BillStatus;
 public interface BillRepository extends JpaRepository<Bill, Long>{
                           
 	List<Bill> findByStatus(BillStatus billStatus);
-	List<Bill> findByCustomerId(Long customerId);
-	List<Bill> findByVendorId(Long vendorId);
+//	List<Bill> findByCustomerId(Long customerId);
+//	List<Bill> findByVendorId(Long vendorId);
 }
