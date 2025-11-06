@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.Client.InvoiceClient;
@@ -56,7 +61,7 @@ public class BillServiceImpl implements BillService {
             payload.put("status", bill.getStatus().name());
             invoiceClient.updateInvoiceStatus(bill.getInvoiceNumber(), payload);
         } catch (Exception e) {
-            System.err.println("⚠️ Failed to sync invoice status for " 
+            System.err.println(" Failed to sync invoice status for " 
                 + bill.getInvoiceNumber() + ": " + e.getMessage());
         }
     }
@@ -77,18 +82,30 @@ public class BillServiceImpl implements BillService {
         Bill existing = billRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bill not found with id: " + id));
 
-        existing.setTotalAmount(bill.getTotalAmount());
-        existing.setDueDate(bill.getDueDate());
-        existing.setInvoiceDate(bill.getInvoiceDate());
+        //  Update all editable fields
+        existing.setInvoiceNumber(bill.getInvoiceNumber());
         existing.setPoNumber(bill.getPoNumber());
         existing.setPaymentTerm(bill.getPaymentTerm());
-        existing.setTransactionId(bill.getTransactionId());
-        existing.setBillDescription(bill.getBillDescription());
+        existing.setTotalAmount(bill.getTotalAmount());
+        existing.setInvoiceDate(bill.getInvoiceDate());
+        existing.setDueDate(bill.getDueDate());
+        existing.setPaymentDate(bill.getPaymentDate());
         existing.setStatus(bill.getStatus());
+        existing.setBillDescription(bill.getBillDescription());
+        existing.setConsultantName(bill.getConsultantName());
+        existing.setApprovalStatus(bill.getApprovalStatus());
+        existing.setHoursWorked(bill.getHoursWorked());
+        existing.setTransactionId(bill.getTransactionId());
+        existing.setRate(bill.getRate());
+        existing.setProjectName(bill.getProjectName());
+        existing.setPaymentMethod(bill.getPaymentMethod());
+        existing.setPaymentReference(bill.getPaymentReference());
         existing.setUpdatedAt(LocalDateTime.now());
 
         Bill updated = billRepository.save(existing);
         syncInvoiceStatus(updated);
+
+        //  Return the fully updated DTO
         return mapToDTO(updated);
     }
 
@@ -127,4 +144,30 @@ public class BillServiceImpl implements BillService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public Page<BillDTO> getAllBillsWithPaginationAndSearch(int page, int size, String sortField, String sortDir,String keyword) {
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Bill> billPage;
+
+        if (keyword != null && !keyword.isBlank()) {
+            billPage = billRepository.search(keyword, pageable);
+        } else {
+            billPage = billRepository.findAll(pageable);
+        }
+
+        List<BillDTO> dtos = billPage.getContent()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtos, pageable, billPage.getTotalElements());
+    }
+
 }

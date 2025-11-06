@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "INVOICE-SERVICE")
+@FeignClient(name = "INVOICE-SERVICE",url = "${bill.service.url}")
 public interface InvoiceClient {
 
     @PutMapping("/manual-invoice/update-status/{invoiceNumber}")

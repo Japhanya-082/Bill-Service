@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "com.example.client")
+@EnableFeignClients(basePackages = "com.example.Client")
 public class BillPayServiceApplication {
 
 	public static void main(String[] args) {

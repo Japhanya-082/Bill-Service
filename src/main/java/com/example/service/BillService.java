@@ -1,6 +1,9 @@
 package com.example.service;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+
 import com.example.DTO.BillDTO;
 import com.example.entity.Bill;
 
@@ -13,4 +16,6 @@ public interface BillService {
 //    List<BillDTO> getBillsByVendor(Long vendorId);
 //    List<BillDTO> getBillsByCustomer(Long customerId);
     BillDTO markAsPaid(Long id, String paymentReference);
+    
+    public Page<BillDTO> getAllBillsWithPaginationAndSearch(int page,int size,String sortField,  String sortDir,String keyword);
 }

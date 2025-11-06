@@ -7,9 +7,8 @@ import com.example.status.BillStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +29,7 @@ public class Bill {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String invoiceNumber;  // maps to invoiceNumber in Invoice Service
+    private String invoiceNumber;  // maps to invoiceNumber in Invoice Service	
 
     private String poNumber;
     private String paymentTerm;
@@ -53,9 +52,10 @@ public class Bill {
 
     private String billDescription;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = com.example.converter.BillStatusConverter.class)
     @Column(nullable = false)
     private BillStatus status;
+
 
 //    private Long customerId;
 //    private Long vendorId;
